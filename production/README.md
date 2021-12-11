@@ -23,7 +23,7 @@ pip install PuLP
 
 ## Usage
 ```
-git clone 
+git clone git@github.com:teradai/demo_PuLP.git
 cd production
 python src/main.py sample/instance1.txt sample/job_limit1.txt
 ```
