@@ -9,14 +9,13 @@ class IpProblem():
     def __init__(self):
         self.__problem = pulp.LpProblem(sense=pulp.LpMaximize)
     
-    def create_model(self, items: list[Item]) -> None:
+    def create_model(self, items: list[Item], job_limit: list[int]) -> None:
         self.__x_item = [pulp.LpVariable(name=item["name"], lowBound=0, cat=pulp.LpBinary) for item in items]
 
         #   create objective function
         assert len(items) == len(self.__x_item)
         self.__problem += pulp.lpSum(item["profit"] * x for item, x in zip(items, self.__x_item))
         
-        job_limit = [7, 14]
         #   create constraints
         assert len(job_limit) == len(items[0]["job"])
         for i in range(len(job_limit)):
@@ -48,7 +47,7 @@ class IpProblem():
     __x_item: list[pulp.pulp.LpVariable]
 
 
-def read_csv(input_file: str) -> list[Item]:
+def read_instance_csv(input_file: str) -> list[Item]:
     items: list[Item] = list()
     with open(input_file, "r") as csv_file:
         reader = csv.reader(csv_file)
@@ -64,17 +63,31 @@ def read_csv(input_file: str) -> list[Item]:
     return items
 
 
+def read_job_limit_csv(input_file: str) -> list[int]:
+    job_limit: list[int] = list()
+    with open(input_file, "r") as csv_file:
+        reader = csv.reader(csv_file)
+        next(reader)    #header
+        for info in reader:
+            job_limit.append(int(info[1]))
+
+    return job_limit
+
+
 def main():
     args: list[str] = sys.argv
-    if ( len(args) != 2):
-        print("python main.py ${input_file}")
+    if ( len(args) != 3):
+        print("python main.py ${input_instance} ${input_job_info}")
         sys.exit(1)
     
-    input_file: str = args[1]
-    items: list[Item] = read_csv(input_file)
+    input_instance: str = args[1]
+    input_job_info: str = args[2]
+
+    items: list[Item] = read_instance_csv(input_instance)
+    job_limit: list[int] = read_job_limit_csv(input_job_info)
 
     problem = IpProblem()
-    problem.create_model(items)
+    problem.create_model(items, job_limit)
 
     result: Result = problem.solve()
     print("status: {}".format(result["status"]))
