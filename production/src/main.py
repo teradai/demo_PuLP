@@ -10,7 +10,7 @@ class IpProblem():
         self.__problem = pulp.LpProblem(sense=pulp.LpMaximize)
     
     def create_model(self, items: list[Item], job_limit: list[int]) -> None:
-        self.__x_item = [pulp.LpVariable(name=item["name"], lowBound=0, cat=pulp.LpBinary) for item in items]
+        self.__x_item = [pulp.LpVariable(name=item["name"], lowBound=0, cat=pulp.LpInteger) for item in items]
 
         #   create objective function
         assert len(items) == len(self.__x_item)
